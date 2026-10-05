@@ -17,7 +17,7 @@ File utama: `kebun_binatang.py` (96 baris, tanpa library eksternal).
 4. [Cara Menambahkan Binatang Baru](#4-cara-menambahkan-binatang-baru-panduan-lengkap)
 5. [Bedah Konsep OOP](#5-bedah-konsep-oop-inti-presentasi)
 6. [Alur Kerja Program (Main hingga Selesai)](#6-alur-kerja-program-dari-main-hingga-selesai)
-7. [Naskah Presentasi / Script Praktikum](#7-naskah-presentasi--script-praktikum-formal)
+7. [Naskah Presentasi / Script Praktikum 4 Orang](#7-naskah-presentasi--script-praktikum-4-orang-formal)
 8. [Tips Presentasi](#8-tips-presentasi-tiga-poin-utama)
 9. [Prediksi Pertanyaan Dosen Beserta Jawaban](#9-prediksi-pertanyaan-kritis-dosen-beserta-jawaban)
 
@@ -476,25 +476,60 @@ Konstruktor (`__init__`) ada di `Hewan, Gajah, Kandang, DokterHewan, KebunBinata
 
 ---
 
-## 7. Naskah Presentasi / Script Praktikum (Formal)
+## 7. Naskah Presentasi / Script Praktikum (4 Orang, Formal)
 
-> Assalamu'alaikum warahmatullahi wabarakatuh. Perkenankan saya mempresentasikan proyek Pemrograman Berorientasi Objek bertema Sistem Kebun Binatang Gembira yang ditulis dalam bahasa Python.
+Pembagian peran:
+
+- **Orang 1 — Pembuka + Abstraksi & Inheritance:** salam, gambaran 10 class, bedah `Hewan`, `Mamalia`, `Burung`, `Singa/Gajah/Elang/Ular`.
+- **Orang 2 — Polimorfisme + Enkapsulasi + Demo Parade:** jelaskan `parade()`, jalankan program, jelaskan `nama/_kesehatan/__berat` + `get_berat/set_berat`.
+- **Orang 3 — Konstruktor, Instance & Cara Pakai + Cara Tambah Hewan Baru:** jelaskan `__init__`/`super()`, praktik `tambah()`, `periksa()`, lalu live coding `Jerapah`.
+- **Orang 4 — Alur Program + Penutup + Tanya Jawab:** rangkum alur Main, kelemahan & pengembangan, penutup dan ajakan diskusi.
+
+---
+
+### Orang 1 — Pembuka, Gambaran Umum, Abstraksi & Inheritance
+
+> Assalamu'alaikum warahmatullahi wabarakatuh, selamat pagi/siang Bapak/Ibu dosen dan teman-teman semua. Perkenankan kelompok kami mempresentasikan proyek Pemrograman Berorientasi Objek bertema Sistem Kebun Binatang Gembira yang ditulis dalam bahasa Python tanpa library tambahan, murni 96 baris kode.
 >
-> Proyek ini terdiri atas sepuluh class yang saling berhubungan: Hewan sebagai induk, Mamalia dan Burung sebagai perantara, Singa, Gajah, Elang, dan Ular sebagai hewan nyata, serta Kandang, DokterHewan, dan KebunBinatang sebagai pengelola.
+> Izinkan saya mengawali dari gambaran besarnya. Apabila diibaratkan kehidupan nyata, sistem ini terdiri atas pemilik kebun yang mengelola area, kandang sebagai wadah penampung, hewan sebagai penghuni, dan dokter hewan sebagai tenaga perawat. Kami tidak mengatur setiap hewan secara manual, melainkan membuat satu cetakan umum berupa class, kemudian mencetak objek-objek nyata seperti Singa bernama Leo seberat 190 kilogram, Gajah bernama Eli, Elang bernama Edo, dan Ular bernama Ulo. Objek-objek itu dimasukkan ke kandang, kandang dihimpun ke kebun, dan kebun menyelenggarakan parade suara sebagai interaksi kolektif.
 >
-> Pertama, dari sisi abstraksi dan inheritance. Class Hewan merupakan cetakan utama yang berisi dua ketentuan kosong, yaitu suara dan gerak. Ketentuan tersebut kemudian diwarisi dan dilengkapi oleh class anak. Mamalia melengkapinya menjadi berjalan, Burung menjadi terbang, sedangkan Singa, Gajah, Elang, dan Ular masing-masing melengkapi suaranya menjadi Roar, Trumpet, Screech, dan Hiss.
+> Total ada sepuluh class dalam proyek ini: Hewan sebagai induk, Mamalia dan Burung sebagai perantara level satu, Singa, Gajah, Elang, dan Ular sebagai hewan nyata level dua, serta Kandang, DokterHewan, dan KebunBinatang sebagai pengelola. Tiga class terakhir bukan turunan Hewan, melainkan class pendukung yang berelasi asosiasi atau komposisi berupa kepemilikan wadah.
 >
-> Kedua, dari sisi polimorfisme. Pada metode parade milik KebunBinatang, hanya terdapat satu perintah, yaitu h.suara. Namun ketika program dijalankan, perintah tersebut menghasilkan empat keluaran yang berbeda sesuai dengan jenis hewannya. Hal ini membuktikan bahwa satu perintah dapat berperilaku banyak.
+> Masuk ke konsep pertama, yaitu abstraksi dan inheritance. Class Hewan berperan sebagai cetakan utama yang sengaja dikosongkan dengan perintah pass pada metode suara dan gerak. Artinya, Hewan hanya menetapkan kontrak bahwa setiap hewan wajib bisa bersuara dan bergerak, tetapi rincian pelaksanaannya diserahkan kepada anak. Mamalia kemudian melengkapi gerak menjadi berjalan dan menambah kemampuan menyusui, Burung melengkapi gerak menjadi terbang, sedangkan Ular yang langsung turunan Hewan mengisi suara menjadi Hiss dan gerak menjadi melata. Di level kedua, Singa mengisi suara menjadi Roar, Gajah menjadi Trumpet, dan Elang menjadi Screech, tanpa perlu menulis ulang gerak karena sudah diwarisi dari induknya. Inilah keuntungan pewarisan: tidak ada duplikasi kode.
 >
-> Ketiga, dari sisi enkapsulasi. Atribut nama bersifat public sehingga bebas dibaca, atribut kesehatan bersifat protected sehingga hanya dikelola oleh kalangan kebun seperti dokter, dan atribut berat bersifat private sehingga hanya dapat diakses melalui get_berat dan set_berat dengan validasi nilai positif.
+> Sebagai bukti, Singa tidak memiliki konstruktor sendiri, tetapi tetap bisa dipanggil dengan Singa Leo 190 karena ia meminjam konstruktor dari Mamalia yang diteruskan dari Hewan. Untuk detail polimorfisme dan perlindungan datanya, akan dilanjutkan oleh rekan saya yang kedua.
+
+### Orang 2 — Polimorfisme, Enkapsulasi, dan Demo Parade
+
+> Terima kasih kepada rekan pertama. Saya akan melanjutkan ke konsep kedua dan ketiga, yaitu polimorfisme dan enkapsulasi, disertai demonstrasi program.
 >
-> Keempat, dari sisi konstruktor dan instance. Seluruh objek nyata dibuat di bagian Main, contohnya leo sama dengan Singa Leo 190. Konstruktor __init__ memberikan nilai awal, dan pada Gajah ditambahkan pemanggilan super init untuk meminjam inisialisasi induk sebelum menambahkan belalai.
+> Perhatikan metode parade milik class KebunBinatang. Isinya hanya dua baris perulangan dan satu perintah inti, yaitu h.suara dalam kurung h.gerak. Perintahnya ditulis satu kali, tetapi ketika program kami jalankan hasilnya ada empat perilaku berbeda: Leo menghasilkan Roar dalam kurung berjalan, Eli menghasilkan Trumpet dalam kurung berjalan, Edo menghasilkan Screech dalam kurung terbang, dan Ulo menghasilkan Hiss dalam kurung melata. Kami tidak memakai if-else sama sekali untuk membedakan jenis hewan. Inilah esensi polimorfisme melalui overriding: satu perintah, banyak gaya. [Saat ini jalankan `python3 kebun_binatang.py` dan tunjukkan 4 baris parade di layar.]
 >
-> Cara menggunakannya: buat objek dengan konstruktor, contoh Singa Leo 190 atau Gajah Eli 1200. Masukkan ke kandang dengan k1.tambah(leo), himpun kandang dengan kebun.tambah_kandang(k1), periksa dengan dok.periksa(leo), lalu tampilkan dengan kebun.parade. Untuk menambah hewan baru, contoh Jerapah turunan Mamalia cukup override suara menjadi Humm, gerak otomatis berjalan, lalu tambahkan ke kandang yang sama tanpa mengubah kode parade.
+> Lanjut ke enkapsulasi atau perlindungan data. Di dalam class Hewan ada tiga tingkatan akses. Pertama, nama bersifat public sehingga bebas dibaca bahkan diganti, contoh leo.nama sama dengan Leon. Kedua, garis bawah kesehatan bersifat protected, artinya secara konvensi hanya kalangan dalam kebun yang boleh menyentuhnya. Contohnya metode DokterHewan.periksa yang mengembalikan h.kesehatan menjadi 100, ini bukan pelanggaran melainkan penggunaan yang sesuai karena dokter adalah bagian internal sistem. Ketiga, garis bawah ganda berat bersifat private dan disembunyikan oleh Python melalui name mangling, sehingga akses langsung seperti eli.berat ganda dari luar akan error AttributeError.
 >
-> Alur programnya berurutan: objek lahir di Main, dimasukkan ke kandang, kandang dimasukkan ke kebun, diperiksa oleh dokter, kemudian ditampilkan dalam parade suara.
+> Agar tetap bisa dibaca dan diubah secara aman, kami menyediakan getter get_berat dan setter set_berat dengan validasi hanya menerima nilai lebih dari nol. Pada demo tadi terlihat berat Eli mula-mula 1200 kilogram, lalu setelah set_berat 1250 berubah menjadi 1250, sedangkan set_berat minus 50 akan ditolak dan nilainya tetap. Metode info juga boleh membaca berat private karena ia berada di dalam class yang sama; aturan private hanya melarang akses dari luar, bukan dari dalam. Selanjutnya rekan ketiga akan menjelaskan bagaimana objek-objek ini dilahirkan dan bagaimana cara memakai serta menambah hewan baru.
+
+### Orang 3 — Konstruktor, Cara Menggunakan Class, dan Cara Menambah Hewan Baru
+
+> Terima kasih. Saya bagian ketiga, menjelaskan konstruktor dan panduan praktis memakai class, sekaligus cara menambah binatang baru.
 >
-> Demikian presentasi saya. Saya siap menjawab pertanyaan. Wassalamu'alaikum warahmatullahi wabarakatuh.
+> Semua objek nyata lahir di blok Main melalui konstruktor garis bawah init. Contohnya leo sama dengan Singa Leo 190, eli sama dengan Gajah Eli 1200 koma 1,8, edo sama dengan Elang Edo 6, dan ulo sama dengan Ular Ulo 8. Tanpa pembuatan instance ini, seluruh class hanya berupa rancangan tanpa realisasi. Kasus khusus ada pada Gajah yang membutuhkan atribut tambahan belalai. Ia mendefinisikan init sendiri, memanggil super init nama berat untuk meminjam proses induk, lalu menambah self.belalai. Nilai defaultnya 2, jadi boleh diisi 1,8 seperti Eli atau dikosongkan.
+>
+> Cara menggunakannya selalu tiga langkah: buat objek, masukkan ke wadah, panggil metodenya. Pertama, buat kandang dengan Kandang Mamalia, lalu k1.tambah(leo) untuk memasukkan singa dan gajah. Kedua, buat kebun dengan KebunBinatang Gembira, lalu kebun.tambah_kandang(k1) untuk menghimpun kandang. Ketiga, buat dokter dengan DokterHewan Dr. Ani, lalu dok.periksa(leo) yang mengembalikan kalimat Dr. Ani memeriksa Leo sehat. Terakhir, panggil kebun.parade untuk menampilkan semuanya. Fungsi lain yang sering dipakai adalah eli.menyusui yang membuktikan warisan dari Mamalia, serta eli.info yang mencetak ringkasan satu baris nama, gerak, suara, dan berat.
+>
+> Kini bagian favorit praktikum: cara menambah hewan baru hanya dalam tiga keputusan. Satu, pilih induk terdekat. Kalau menyusui pilih Mamalia, kalau bersayap pilih Burung, kalau bukan keduanya pilih Hewan langsung. Dua, override suara, dan tambah gerak bila induknya Hewan langsung. Tiga, buat instance dan masukkan ke kandang lama, tanpa mengubah kode parade. [Live coding di depan kelas:] Contoh paling mudah adalah Jerapah turunan Mamalia yang cukup berisi def suara return Humm. Setelah itu jara sama dengan Jerapah Jara 800 otomatis bisa berjalan dan menyusui karena warisan, lalu k1.tambah(jara) dan parade ulang langsung memunculkan Jara Humm dalam kurung berjalan. Contoh lain: Merpati turunan Burung cukup isi suara Coo, Pinguin turunan Burung tapi override gerak menjadi berenang karena tidak terbang, Buaya turunan Hewan wajib isi suara Growl dan gerak merangkak, dan Kanguru meniru Gajah dengan init tambahan panjang_ekor plus super init. Kesalahan umum yang harus dihindari adalah lupa self, salah pilih induk, membuat init baru tanpa super init sehingga nama hilang, dan menulis print di dalam suara padahal harus return agar parade tidak mencetak None.
+>
+> Setelah hewan baru berhasil tampil di parade, artinya polimorfisme bekerja. Alur lengkap dan penutup akan disampaikan oleh rekan keempat.
+
+### Orang 4 — Alur Program, Kelemahan, dan Penutup
+
+> Terima kasih. Saya bagian terakhir, merangkum alur kerja program dari Main hingga selesai, lalu menutup presentasi.
+>
+> Alurnya berurutan dalam enam tahap. Pertama, tahap kelahiran: Main mencetak empat hewan, dua kandang, satu kebun, dan satu dokter. Kedua, tahap pengisian kandang: k1 menampung Leo dan Eli sebagai kandang Mamalia, k2 menampung Edo dan Ulo. Ketiga, tahap penghimpunan: kedua kandang dimasukkan ke Kebun Binatang Gembira. Keempat, tahap pemeriksaan: dokter memeriksa Leo dan mengembalikan kesehatannya menjadi 100. Kelima, tahap demonstrasi warisan dan enkapsulasi: eli.menyusui membuktikan warisan Mamalia, sedangkan get_berat dan set_berat membuktikan akses aman. Keenam, tahap parade: kebun menelusuri setiap kandang dan memanggil h.suara secara berurutan sehingga keluar empat suara berbeda sebagai wujud polimorfisme.
+>
+> Secara jujur, rancangan ini masih dasar dan terbuka untuk pengembangan. Metode induk baru memakai pass sehingga belum memaksa anak mengisi secara ketat, belum ada fitur menghapus hewan dari kandang, dan validasi data masih terbatas pada berat positif. Pengembangan selanjutnya dapat memakai ABC dan abstractmethod untuk penegakan kontrak, menambah metode hapus dan cari, serta validasi umur dan persistensi data. Justru kesederhanaan inilah yang membuatnya cocok untuk pembelajaran: dalam kurang dari seratus baris, empat pilar OOP yaitu abstraksi, inheritance, polimorfisme, dan enkapsulasi, plus konstruktor dan instance, semuanya terlihat bekerja bersama.
+>
+> Demikian presentasi kelompok kami. Kami siap menjawab pertanyaan, kritik, dan saran. Wassalamu'alaikum warahmatullahi wabarakatuh. [Buka sesi tanya jawab; siapkan jawaban untuk: mengapa Hewan tidak dibuat objek langsung, mengapa Singa tanpa init bisa punya nama, mengapa Gajah butuh super, beda nama/kesehatan/berat, dan di mana bukti polimorfisme.]
 
 ---
 
