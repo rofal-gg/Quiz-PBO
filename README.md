@@ -1,554 +1,288 @@
-# Sistem Kebun Binatang Gembira — Panduan Praktikum PBO (Python)
+# Sistem Manajemen Kafe Belbel Cafe & Bakery — OOP + UML + JSON
 
-Simulasi pengelolaan kebun binatang dengan Pemrograman Berorientasi Objek (PBO) Python.
-Analogi nyata: **Pemilik kebun** mengelola area, **Kandang** sebagai wadah, **Hewan** sebagai penghuni, **DokterHewan** sebagai perawat. Pengguna tidak mengatur tiap hewan manual, melainkan membuat **satu cetakan (class)**, lalu **mencetak objek nyata** seperti `Singa("Leo")`, `Gajah("Eli")`, `Elang("Edo")`, `Ular("Ulo")`, memasukkannya ke kandang, menghimpun kandang ke kebun, lalu menjalankan parade suara.
+Program pendataan karyawan kafe yang bermanfaat nyata: tambah karyawan,
+catat gaji float tervalidasi, nilai kinerja oleh manajer, atur shift,
+tampilkan operasional dan laporan, serta simpan otomatis ke JSON agar
+tidak hilang saat program ditutup. Ditulis dengan sintaks pemula:
+hanya `import json`, tanpa dekorator, tanpa sintaks lanjutan.
 
-Total **10 class**: `Hewan, Mamalia, Burung, Singa, Gajah, Elang, Ular, Kandang, DokterHewan, KebunBinatang`.
-
-File utama: `kebun_binatang.py` (96 baris, tanpa library eksternal).
-
----
+File utama: `kafe.py` (11 class) | Data: `data/karyawan.json` |
+Model: `docs/UML-kafe.md` | Arsip teman: `arsip/code_baru.py` (ber-bug, jangan dikumpulkan)
 
 ## Daftar Isi
 
-1. [Cara Menjalankan Program](#1-cara-menjalankan-program)
-2. [Penjelasan Lengkap Kode per Class](#2-penjelasan-lengkap-kode-per-class-untuk-dipelajari)
-3. [Cara Menggunakan Class dan Fungsinya (dengan Contoh Sintaks)](#3-cara-menggunakan-class-dan-fungsinya-dengan-contoh-sintaks)
-4. [Cara Menambahkan Binatang Baru](#4-cara-menambahkan-binatang-baru-panduan-lengkap)
-5. [Bedah Konsep OOP](#5-bedah-konsep-oop-inti-presentasi)
-6. [Alur Kerja Program (Main hingga Selesai)](#6-alur-kerja-program-dari-main-hingga-selesai)
-7. [Naskah Presentasi / Script Praktikum 4 Orang](#7-naskah-presentasi--script-praktikum-4-orang-formal)
-8. [Tips Presentasi](#8-tips-presentasi-tiga-poin-utama)
-9. [Prediksi Pertanyaan Dosen Beserta Jawaban](#9-prediksi-pertanyaan-kritis-dosen-beserta-jawaban)
+1. [Pembukaan](#1-pembukaan)
+2. [Analisis Kasus dan Manfaat Dunia Nyata](#2-analisis-kasus-dan-manfaat-dunia-nyata)
+3. [Model UML dan Relasi](#3-model-uml-dan-relasi)
+4. [Cara Menjalankan dan Memakai Menu](#4-cara-menjalankan-dan-memakai-menu)
+5. [Struktur JSON](#5-struktur-json)
+6. [Penjelasan Kode per Class](#6-penjelasan-kode-per-class)
+7. [Panduan Lengkap Sintaks Class untuk Pemula](#7-panduan-lengkap-sintaks-class-untuk-pemula)
+8. [Tata Cara Menambah Peran Baru](#8-tata-cara-menambah-peran-baru)
+9. [Bedah Konsep OOP](#9-bedah-konsep-oop)
+10. [Bukti Keselarasan Model vs Program](#10-bukti-keselarasan-model-vs-program)
+11. [Alur Program](#11-alur-program)
+12. [Pembelajaran Bertahap](#12-pembelajaran-bertahap)
+13. [Naskah Presentasi 4 Orang](#13-naskah-presentasi-4-orang)
+14. [Tips Presentasi](#14-tips-presentasi)
+15. [Prediksi Pertanyaan Dosen](#15-prediksi-pertanyaan-dosen)
 
 ---
 
-## 1. Cara Menjalankan Program
+## 1. Pembukaan
+
+Proyek ini merupakan simulasi sistem informasi kafe yang dimodelkan
+dengan Pemrograman Berorientasi Objek menggunakan bahasa Python.
+Apabila diibaratkan dalam kehidupan nyata, kafe memiliki pegawai
+dengan peran berbeda (Waiter, Kasir, Baker, Barista), shift kerja
+sebagai wadah (Pagi, Sore), manajer sebagai penilai, sistem kafe
+sebagai koordinator, dan database JSON sebagai arsip.
+
+Pengguna tidak mencatat di kertas, melainkan mencetak objek nyata
+seperti `Waiter("Andi","W01",3000000.0)`, memasukkannya ke shift,
+menilainya, lalu menampilkan operasional. Satu perintah operasional
+menampilkan empat aktivitas berbeda secara otomatis.
+
+Kesebelas class: `Pegawai, FrontOfHouse, BackOfHouse, Waiter, Kasir,
+Baker, Barista, ShiftKerja, StoreManager, SistemCafe, DatabaseJSON`.
+
+## 2. Analisis Kasus dan Manfaat Dunia Nyata
+
+Masalah nyata kafe kecil: data karyawan tersebar, gaji lupa dicatat,
+penilaian kinerja tidak terdokumentasi, jadwal shift tertukar, data
+hilang saat pergantian shift. Solusi program ini: tambah karyawan
+lewat ketikan dengan validasi (ID unik, gaji angka positif float),
+timbang gaji ulang via `set_gaji()`, evaluasi manajer (+10 poin,
+maks 200), laporan dan operasional sebagai rekap harian, simpan ke
+`data/karyawan.json` sehingga besok dibuka tetap ada.
+
+Contoh manfaat yang sudah teruji: tambah Eka (W02) ke Pagi, tolak
+duplikat W02, tolak gaji huruf, nilai Andi (W01) 100 menjadi 110 dan
+tersimpan, operasional bertambah satu baris tanpa mengubah kode
+`operasional()`.
+
+## 3. Model UML dan Relasi
+
+Diagram lengkap di `docs/UML-kafe.md`. Ringkasan:
+
+```mermaid
+classDiagram
+    class Pegawai {
+        <<abstract>>
+        +nama
+        +id_pegawai
+        #poin
+        -gaji
+        +aktivitas()
+        +get_gaji()
+        +set_gaji(n)
+        +ke_dict()
+    }
+    class FrontOfHouse { +layani() ramah }
+    class BackOfHouse { +layani() dapur }
+    class Waiter { +aktivitas() antar }
+    class Kasir { +aktivitas() bayar }
+    class Baker { +spesialisasi +aktivitas() panggang }
+    class Barista { +aktivitas() seduh }
+    class ShiftKerja { +nama_shift +daftar +tambah() +cari() }
+    class StoreManager { +nama +evaluasi() }
+    class SistemCafe { +nama_cafe +jadwal +atur_shift() +operasional() +laporan() }
+    class DatabaseJSON { +path +simpan() +muat() }
+    Pegawai <|-- FrontOfHouse
+    Pegawai <|-- BackOfHouse
+    FrontOfHouse <|-- Waiter
+    FrontOfHouse <|-- Kasir
+    BackOfHouse <|-- Baker
+    BackOfHouse <|-- Barista
+    SistemCafe *-- ShiftKerja
+    ShiftKerja o-- Pegawai
+    StoreManager ..> Pegawai
+    SistemCafe --> StoreManager
+    DatabaseJSON ..> SistemCafe
+```
+
+Makna: Generalization 6 panah (warisi tanpa tulis ulang),
+Composition kebun-shift (`self.jadwal`, `atur_shift`),
+Aggregation shift-pegawai (`self.daftar`, `tambah`),
+Dependency manajer-pegawai (`def evaluasi(self,p)`),
+Dependency JSON (`simpan(cafe)/muat(cafe)`).
+
+Abstraksi memakai `pass` agar mudah dipahami pemula (kontrak kosong,
+bukan `ABC` ketat). Konsekuensinya induk masih bisa dibuat langsung
+dan hasilnya `None` — ini keterbatasan yang disengaja dan menjadi
+bahan Q&A, bukan bug tersembunyi.
+
+## 4. Cara Menjalankan dan Memakai Menu
 
 ```bash
-# dari folder proyek:
-python3 kebun_binatang.py
+python kafe.py
 ```
 
-Output yang benar:
+Menu:
 
-```text
-Dr. Ani memeriksa Leo: sehat!
-Eli menyusui anaknya | belalai: 1.8 m
-Berat Eli: 1200 kg
-Berat baru: 1250 kg
---- Parade Suara ---
-Leo: Roar! (berjalan)
-Eli: Trumpet! (berjalan)
-Edo: Screech! (terbang)
-Ulo: Hiss! (melata)
+```
+1 Tambah | 2 Laporan | 3 Evaluasi | 4 Operasional | 5 Simpan+Keluar
 ```
 
-> Program tidak butuh `pip install` apa pun. Cukup Python 3.
+Tata cara: pilih 1 isi Nama, ID unik, Gaji angka positif, peran 1-4,
+shift tujuan (baru otomatis dibuat). Pilih 2 untuk tabel, 3 isi ID
+untuk +10 poin, 4 untuk parade aktivitas, 5 untuk simpan dan keluar.
+Wajib keluar via 5 agar tersimpan. Data awal otomatis dibuat bila
+JSON belum ada.
 
----
+## 5. Struktur JSON
 
-## 2. Penjelasan Lengkap Kode per Class (Untuk Dipelajari)
+`data/karyawan.json`:
 
-### 2.1 `class Hewan` — Induk abstrak semua hewan
-
-```python
-class Hewan:
-    def __init__(self, nama, berat):
-        self.nama = nama            # public: bebas dibaca
-        self._kesehatan = 100       # protected: milik internal kebun
-        self.__berat = berat        # private: disembunyikan
-    def suara(self):
-        pass  # kosong, anak wajib isi sendiri
-    def gerak(self):
-        pass  # kosong, anak wajib isi sendiri
-    def get_berat(self):
-        return self.__berat            # getter
-    def set_berat(self, b):            # setter + validasi
-        if b > 0: self.__berat = b
-    def info(self):
-        return f"{self.nama} | {self.gerak()} | {self.suara()} | {self.__berat}kg"
+```json
+{
+  "nama_cafe": "Belbel Cafe",
+  "shift": [{"nama": "Pagi", "isi": [
+    {"peran": "Waiter", "nama": "Andi", "id": "W01", "gaji": 3000000.0, "poin": 100},
+    {"peran": "Baker", "nama": "Cici", "id": "B01", "gaji": 4000000.0, "poin": 100, "spesialisasi": "Pastry"}
+  ]}]
+}
 ```
 
-Penjelasan baris per baris:
+`peran` wajib agar `buat_pegawai()` tahu membuat class yang tepat.
+Gaji diambil via `get_gaji()` karena `__gaji` private. Data asing
+(`peran` tak dikenal) diberi peringatan dan dianggap Waiter agar
+tidak diam-diam salah.
 
-- `__init__(self, nama, berat)` — konstruktor. Dipanggil otomatis saat `Hewan("X", 10)`. Mengisi 3 atribut: `nama`, `_kesehatan`, `__berat`.
-- `self.nama` — **public**. Boleh dibaca/tulis dari mana saja: `leo.nama`, `leo.nama = "Leon"`.
-- `self._kesehatan` — **protected** (konvensi satu underscore). Artinya "jangan disentuh orang luar, hanya kalangan kebun". Contoh yang boleh: `DokterHewan.periksa()` mengeset `h._kesehatan = 100`.
-- `self.__berat` — **private** (dua underscore). Python mengubah namanya jadi `_Hewan__berat` (name mangling) sehingga `eli.__berat` dari luar akan error `AttributeError`. Satu-satunya jalan resmi: `get_berat()` / `set_berat()`.
-- `suara()` / `gerak()` berisi `pass` — sengaja dikosongkan. Ini kontrak: "setiap hewan WAJIB punya suara dan gerak, isinya terserah anak". Ini bentuk **abstraksi sederhana** (versi ketatnya memakai `ABC` + `@abstractmethod`, lihat bagian 9 soal kelemahan).
-- `get_berat()` / `set_berat(b)` — getter/setter aman. Setter menolak nilai `<= 0`, jadi berat tidak bisa negatif/nol.
-- `info()` — metode bantu. Boleh membaca `self.__berat` karena ia **berada di dalam class yang sama**. Aturan private hanya melarang akses dari luar, bukan dari dalam.
+## 6. Penjelasan Kode per Class
 
-### 2.2 `class Mamalia(Hewan)` dan `class Burung(Hewan)` — Perantara level 1
+### 6.1 `Pegawai` — induk abstrak
+`__init__(nama, id_pegawai, gaji)` mengisi `nama/id` public,
+`_poin=100` protected, `__gaji` private. `aktivitas(): pass`
+sengaja kosong sebagai kontrak. `get_gaji/set_gaji(>0)`,
+`get_poin`, `info()`, `ke_dict()` untuk JSON.
 
-```python
-class Mamalia(Hewan):
-    def gerak(self):
-        return "berjalan"  # sifat umum mamalia
-    def menyusui(self):
-        return f"{self.nama} menyusui anaknya"
+### 6.2 `FrontOfHouse`, `BackOfHouse`
+`FrontOfHouse(Pegawai)` mengisi `layani()` ramah,
+`BackOfHouse(Pegawai)` mengisi `layani()` dapur. Diwarisi ke anak.
 
-class Burung(Hewan):
-    def gerak(self):
-        return "terbang"   # sifat umum burung
-```
+### 6.3 `Waiter, Kasir, Baker, Barista`
+Masing-masing mengisi `aktivitas()` berbeda. `Baker` contoh
+`__init__+super().__init__+spesialisasi` dan override `ke_dict`.
+`Waiter("Andi","W01",3000000.0)` bisa walau tanpa `__init__`
+karena warisan.
 
-- `(Hewan)` artinya **inheritance**: mewarisi `__init__`, `nama`, `_kesehatan`, `__berat`, `get_berat`, `set_berat`, `info`, `suara` dari `Hewan` tanpa menulis ulang.
-- `Mamalia` mengisi `gerak()` menjadi `"berjalan"` dan menambah kemampuan baru `menyusui()`. Semua anak Mamalia (Singa, Gajah) otomatis bisa `menyusui()` dan `berjalan`.
-- `Burung` mengisi `gerak()` menjadi `"terbang"`. Semua anak Burung otomatis bisa terbang kecuali meng-override ulang (contoh: Pinguin, lihat bagian 4).
+### 6.4 `ShiftKerja`, `StoreManager`, `SistemCafe`, `DatabaseJSON`
+`ShiftKerja`: `daftar=[]`, `tambah(p)`, `cari(id)`, `ke_dict()`.
+`StoreManager`: `evaluasi(p)` tambah poin maks 200.
+`SistemCafe`: `jadwal=[]`, `atur_shift`, `cari_shift/pegawai`,
+`operasional()` loop `p.aktivitas()`, `laporan()` tabel.
+`DatabaseJSON(path)`: `simpan` dump, `muat` load, gagal False.
+Tanpa dekorator, metode biasa. Fungsi bebas: `buat_pegawai`,
+`buat_shift`, `contoh_awal`, `tanya_angka`, `menu`.
 
-### 2.3 `class Singa, Gajah, Elang, Ular` — Hewan nyata level 2
+## 7. Panduan Lengkap Sintaks Class untuk Pemula
 
-```python
-class Singa(Mamalia):
-    def suara(self):
-        return "Roar!"
+Rumus dasar: `class Nama:` menjorok 4 spasi. Nama PascalCase.
+`def __init__(self,...):` otomatis jalan saat
+`andi = Waiter("Andi","W01",3000000.0)`. `self` artinya objek ini
+dan wajib parameter pertama. `self.nama=nama` menempelkan data.
+Warisan: `class Anak(Induk):`, contoh `class Waiter(FrontOfHouse):`.
+`super().__init__(...)` meminjam init induk sebelum tambah atribut
+baru (contoh `Baker`). Method: `def nama(self):` + `return`,
+dipanggil `andi.aktivitas()`. `pass` artinya kosongkan.
+Komposisi: `self.daftar=[]` + `tambah(p)` menampung objek lain.
+Empat langkah pakai class: definisikan → wariskan bila perlu →
+lahirkan di Main/menu → gunakan (`p.aktivitas()`, `get_gaji()`).
 
-class Gajah(Mamalia):
-    def __init__(self, nama, berat, belalai=2):
-        super().__init__(nama, berat)
-        self.belalai = belalai
-    def suara(self):
-        return "Trumpet!"
+## 8. Tata Cara Menambah Peran Baru
 
-class Elang(Burung):
-    def suara(self):
-        return "Screech!"
+Pilih induk terdekat: pelayan → `FrontOfHouse`, dapur →
+`BackOfHouse`. Override `aktivitas()` (dan `layani()` bila perlu),
+buat instance, masukkan via `shift.tambah()`, uji di operasional.
+Contoh: `class CleaningService(BackOfHouse): def aktivitas(self):
+return "Membersihkan meja."` lalu otomatis ikut operasional.
+Bila butuh atribut baru, tiru `Baker` (`super` + `ke_dict`).
+Checklist: `return` bukan `print`, ID unik, uji `get/set`,
+pastikan muncul di operasional tanpa ubah `operasional()`.
+Kesalahan umum: lupa `self`, salah induk, `__init__` tanpa `super`.
 
-class Ular(Hewan):  # langsung dari Hewan, tanpa perantara
-    def suara(self):
-        return "Hiss!"
-    def gerak(self):
-        return "melata"
-```
+## 9. Bedah Konsep OOP
 
-- `Singa` hanya mengisi `suara()`. `gerak()` tidak ditulis karena sudah diwarisi `"berjalan"` dari `Mamalia`. Konstruktor pun diwarisi, jadi `Singa("Leo", 190)` tetap bisa isi nama+berat walau Singa tidak punya `__init__` sendiri.
-- `Gajah` contoh **konstruktor + `super()`**: butuh atribut tambahan `belalai` yang tidak dimiliki hewan lain. `super().__init__(nama, berat)` = "pinjam proses inisialisasi induk dulu", lalu tambah `self.belalai`. Nilai default `belalai=2` (meter) boleh diisi boleh tidak.
-- `Elang` sama polanya seperti Singa, tapi mewarisi `"terbang"` dari `Burung`.
-- `Ular` langsung mewarisi `Hewan` karena bukan mamalia maupun burung. Ia wajib mengisi **keduanya**: `suara()` → `"Hiss!"` dan `gerak()` → `"melata"`.
+Abstraksi: `Pegawai` kontrak kosong. Inheritance:
+`Waiter(FrontOfHouse(Pegawai))` warisi nama/id/gaji/poin.
+Polimorfisme: satu `p.aktivitas()` → antar/bayar/panggang/seduh,
+satu `p.layani()` → ramah/dapur, tanpa `if` di operasional.
+Enkapsulasi: `__gaji` via getter/setter, `_poin` via manajer.
+Konstruktor/Instance: `__init__` nilai awal,
+`andi=Waiter(...)` wujud nyata di Main/menu.
 
-### 2.4 `class Kandang` — Wadah hewan
+## 10. Bukti Keselarasan Model vs Program
 
-```python
-class Kandang:
-    def __init__(self, nama):
-        self.nama = nama
-        self.isi = []
-    def tambah(self, h):
-        self.isi.append(h)
-```
-
-- `nama`: label kandang, misal `"Mamalia"`, `"Lainnya"`.
-- `isi`: list kosong yang menampung objek hewan.
-- `tambah(h)`: memasukkan satu objek hewan ke list. `h` bisa objek apa saja yang punya `suara()`/`gerak()` (duck typing).
-
-### 2.5 `class DokterHewan` — Perawat hewan
-
-```python
-class DokterHewan:
-    def __init__(self, nama):
-        self.nama = nama
-    def periksa(self, h):
-        h._kesehatan = 100
-        return f"{self.nama} memeriksa {h.nama}: sehat!"
-```
-
-- `periksa(h)` menyentuh atribut **protected** `h._kesehatan`. Ini diperbolehkan karena dokter adalah "kalangan dalam kebun", bukan orang luar. Ini BUKAN pelanggaran enkapsulasi, melainkan penggunaan sesuai konvensi.
-
-### 2.6 `class KebunBinatang` — Koordinator semua kandang
-
-```python
-class KebunBinatang:
-    def __init__(self, nama):
-        self.nama = nama
-        self.kandang = []
-    def tambah_kandang(self, k):
-        self.kandang.append(k)
-    def parade(self):
-        for k in self.kandang:
-            for h in k.isi: print(f"{h.nama}: {h.suara()} ({h.gerak()})")
-```
-
-- Struktur bersarang: `KebunBinatang` → punya banyak `Kandang` → tiap kandang punya banyak `Hewan`. Ini relasi **komposisi/asosiasi**, bukan pewarisan.
-- `parade()` adalah bukti **polimorfisme**: satu perintah `h.suara()` menghasilkan output berbeda per objek (lihat bagian 5).
-
-### 2.7 Blok `Main` — Tempat semua objek dilahirkan
-
-```python
-if __name__ == "__main__":
-    leo = Singa("Leo", 190)
-    eli = Gajah("Eli", 1200, 1.8)
-    edo = Elang("Edo", 6)
-    ulo = Ular("Ulo", 8)
-
-    k1 = Kandang("Mamalia"); k1.tambah(leo); k1.tambah(eli)
-    k2 = Kandang("Lainnya"); k2.tambah(edo); k2.tambah(ulo)
-
-    kebun = KebunBinatang("Gembira"); kebun.tambah_kandang(k1); kebun.tambah_kandang(k2)
-    dok = DokterHewan("Dr. Ani")
-
-    print(dok.periksa(leo))
-    print(eli.menyusui(), "| belalai:", eli.belalai, "m")
-    print("Berat Eli:", eli.get_berat(), "kg"); eli.set_berat(1250)
-    print("Berat baru:", eli.get_berat(), "kg")
-    print("--- Parade Suara ---"); kebun.parade()
-```
-
-- Tanpa blok ini, semua class hanya rancangan. `leo = Singa("Leo", 190)` = mencetak objek nyata dari cetakan class lewat konstruktor.
-- `if __name__ == "__main__":` artinya kode di dalamnya hanya jalan saat file dieksekusi langsung, tidak saat di-`import` dari file lain (penting untuk praktikum/import ulang).
-
----
-
-## 3. Cara Menggunakan Class dan Fungsinya (dengan Contoh Sintaks)
-
-Pola umum selalu sama 3 langkah: **import (jika beda file) → buat objek → panggil metode**.
-
-```python
-from kebun_binatang import Singa, Gajah, Elang, Ular, Kandang, DokterHewan, KebunBinatang
-```
-
-### 3.1 Membuat hewan (konstruktor + instance)
-
-```python
-leo = Singa("Leo", 190)       # (nama, berat_kg) — __init__ diwarisi dari Hewan
-eli = Gajah("Eli", 1200, 1.8) # (nama, berat_kg, belalai_meter) — belalai opsional, default 2
-edo = Elang("Edo", 6)         # burung kecil 6 kg
-ulo = Ular("Ulo", 8)          # langsung dari Hewan
-
-# Tanpa belalai pun bisa (pakai default):
-eli2 = Gajah("Eli2", 1100)
-print(eli2.belalai)  # -> 2
-```
-
-Aturan parameter:
-
-| Class | Signature | Contoh |
+| UML | Kode `kafe.py` | Uji |
 |---|---|---|
-| `Singa(nama, berat)` | warisan `Hewan.__init__` | `Singa("Leo", 190)` |
-| `Gajah(nama, berat, belalai=2)` | `__init__` sendiri + `super()` | `Gajah("Eli", 1200, 1.8)` |
-| `Elang(nama, berat)` | warisan `Hewan.__init__` | `Elang("Edo", 6)` |
-| `Ular(nama, berat)` | warisan `Hewan.__init__` | `Ular("Ulo", 8)` |
-
-### 3.2 Fungsi di dalam `Hewan` (diwarisi semua hewan)
-
-```python
-# suara() dan gerak() — perilaku khas tiap hewan (hasil overriding):
-print(leo.suara())  # Roar!      (dari Singa)
-print(leo.gerak())  # berjalan   (dari Mamalia)
-print(edo.gerak())  # terbang    (dari Burung)
-print(ulo.suara())  # Hiss!      (dari Ular)
-print(ulo.gerak())  # melata     (dari Ular)
-
-# nama (public) — bebas baca/tulis:
-print(leo.nama)         # Leo
-leo.nama = "Leon"       # boleh diganti langsung
-
-# _kesehatan (protected) — JANGAN ubah manual dari luar, pakai dokter:
-print(leo._kesehatan)   # 100 (boleh dibaca, tapi jangan ditimpa manual)
-
-# __berat (private) — WAJIB lewat getter/setter:
-print(eli.get_berat())  # 1200
-eli.set_berat(1250)     # valid -> berubah
-eli.set_berat(-50)      # tidak valid -> ditolak, berat tetap 1250
-# eli.__berat           # ERROR AttributeError, jangan dilakukan
-
-# info() — ringkasan satu baris:
-print(eli.info())  # Eli | berjalan | Trumpet! | 1200kg
-```
-
-### 3.3 Fungsi khusus `Mamalia` — `menyusui()`
-
-```python
-print(leo.menyusui())  # Leo menyusui anaknya
-print(eli.menyusui())  # Eli menyusui anaknya
-# print(edo.menyusui())  # ERROR — Elang bukan Mamalia, tidak punya metode ini
-```
-
-Hanya `Singa` dan `Gajah` (turunan `Mamalia`) yang bisa memanggilnya.
-
-### 3.4 Fungsi di dalam `Kandang` — `tambah()`
-
-```python
-k1 = Kandang("Mamalia")  # buat wadah
-k1.tambah(leo)           # masukkan satu hewan
-k1.tambah(eli)
-print(len(k1.isi))       # 2
-print(k1.isi[0].nama)    # Leo
-```
-
-### 3.5 Fungsi di dalam `DokterHewan` — `periksa()`
-
-```python
-dok = DokterHewan("Dr. Ani")
-print(dok.periksa(leo))  # Dr. Ani memeriksa Leo: sehat!
-print(leo._kesehatan)    # 100 (sudah dipulihkan dokter)
-```
-
-### 3.6 Fungsi di dalam `KebunBinatang` — `tambah_kandang()` dan `parade()`
-
-```python
-kebun = KebunBinatang("Gembira")
-kebun.tambah_kandang(k1)
-kebun.tambah_kandang(k2)
-
-kebun.parade()
-# Leo: Roar! (berjalan)
-# Eli: Trumpet! (berjalan)
-# Edo: Screech! (terbang)
-# Ulo: Hiss! (melata)
-```
-
-### 3.7 Contoh alur lengkap minimal (copy-paste untuk praktikum)
-
-```python
-from kebun_binatang import Singa, Gajah, Kandang, KebunBinatang, DokterHewan
-
-leo = Singa("Leo", 190)
-eli = Gajah("Eli", 1200)
-
-k1 = Kandang("Mamalia")
-k1.tambah(leo)
-k1.tambah(eli)
-
-kebun = KebunBinatang("Gembira")
-kebun.tambah_kandang(k1)
-
-dok = DokterHewan("Dr. Ani")
-print(dok.periksa(leo))
-kebun.parade()
-```
-
----
-
-## 4. Cara Menambahkan Binatang Baru (Panduan Lengkap)
-
-Prinsip: **pilih induk terdekat → override `suara()` (dan `gerak()` bila perlu) → buat instance → masukkan ke kandang → uji di parade**.
-
-### 4.1 Tentukan induknya
-
-| Kalau hewanmu... | Warisi | Yang perlu diisi |
-|---|---|---|
-| Menyusui / berbulu (singa, gajah, jerapah, monyet) | `Mamalia` | `suara()` saja (`gerak()` sudah `berjalan`) |
-| Bersayap / bertelur (elang, merpati) | `Burung` | `suara()` saja (`gerak()` sudah `terbang`) |
-| Bukan keduanya (ular, buaya, katak, ikan) | `Hewan` langsung | `suara()` + `gerak()` |
-| Kasus khusus (pinguin: burung tapi tak terbang) | `Burung` + override `gerak()` | `suara()` + `gerak()` ulang |
-
-### 4.2 Contoh 1 — Mamalia baru: `Jerapah` (paling mudah)
-
-```python
-class Jerapah(Mamalia):
-    def suara(self):
-        return "Humm!"
-```
-
-Pakai:
-
-```python
-jara = Jerapah("Jara", 800)
-print(jara.suara())    # Humm!
-print(jara.gerak())    # berjalan (warisan Mamalia, tanpa kode tambahan)
-print(jara.menyusui()) # Jara menyusui anaknya (warisan Mamalia)
-print(jara.info())     # Jara | berjalan | Humm! | 800kg
-
-k1.tambah(jara)  # masukkan ke kandang yang sudah ada
-kebun.parade()   # otomatis muncul: Jara: Humm! (berjalan)
-```
-
-### 4.3 Contoh 2 — Burung baru: `Merpati`
-
-```python
-class Merpati(Burung):
-    def suara(self):
-        return "Coo!"
-```
-
-```python
-meri = Merpati("Meri", 0.5)
-print(meri.suara())  # Coo!
-print(meri.gerak())  # terbang (warisan Burung)
-```
-
-Kasus khusus — Pinguin (burung tapi tidak terbang), override `gerak()` juga:
-
-```python
-class Pinguin(Burung):
-    def suara(self):
-        return "Honk!"
-    def gerak(self):
-        return "berenang"  # menimpa "terbang" milik Burung
-```
-
-### 4.4 Contoh 3 — Langsung dari `Hewan`: `Buaya`
-
-```python
-class Buaya(Hewan):
-    def suara(self):
-        return "Growl!"
-    def gerak(self):
-        return "merangkak"
-```
-
-```python
-baya = Buaya("Baya", 300)
-print(baya.info())  # Baya | merangkak | Growl! | 300kg
-```
-
-### 4.5 Contoh 4 — Hewan dengan atribut tambahan (meniru `Gajah`)
-
-Misal `Kanguru` butuh `panjang_ekor`:
-
-```python
-class Kanguru(Mamalia):
-    def __init__(self, nama, berat, panjang_ekor=1.0):
-        super().__init__(nama, berat)  # pinjam init induk
-        self.panjang_ekor = panjang_ekor
-    def suara(self):
-        return "Chortle!"
-```
-
-```python
-kang = Kanguru("Kang", 70, 1.2)
-print(kang.suara(), "| ekor:", kang.panjang_ekor, "m")
-```
-
-### 4.6 Checklist setelah menambah hewan
-
-1. `suara()` mengembalikan `str`, bukan `print` di dalam metode.
-2. Jika warisi langsung `Hewan`, pastikan `gerak()` juga diisi (kalau lupa, hasilnya `None` karena `pass`).
-3. Buat instance di Main / file ujimu, masukkan via `kandang.tambah(obj)`.
-4. Jalankan `kebun.parade()` — hewan baru harus muncul tanpa mengubah kode `parade()` (bukti polimorfisme bekerja).
-5. Uji enkapsulasi: `get_berat()` terbaca, `set_berat(-1)` ditolak.
-
-### 4.7 Kesalahan umum praktikan
-
-- Lupa `self`: `def suara():` → harus `def suara(self):`.
-- Salah induk: `class Pinguin(Mamalia)` padahal pinguin burung → `menyusui()` jadi salah konsep.
-- Mengisi `__init__` baru tanpa `super().__init__()` → `nama`/`__berat` hilang, `info()` error.
-- Menulis `print` di dalam `suara()` lalu `parade()` mencetak `None` → selalu `return "..."`, bukan `print("...")`.
-
----
-
-## 5. Bedah Konsep OOP (Inti Presentasi)
-
-### A. Abstraksi dan Inheritance (Pewarisan)
-
-`Hewan` adalah cetakan utama berisi ketentuan kosong (`pass`). Anak melengkapinya:
-
-- Tingkat 1: `Mamalia(Hewan)` mengisi `gerak()` → `berjalan` + tambah `menyusui()`; `Burung(Hewan)` mengisi `gerak()` → `terbang`; `Ular(Hewan)` langsung mengisi `suara()` → `Hiss!` dan `gerak()` → `melata`.
-- Tingkat 2: `Singa(Mamalia)` mengisi `suara()` → `Roar!` (gerak diwarisi); `Gajah(Mamalia)` → `Trumpet!`; `Elang(Burung)` → `Screech!`.
-
-`Kandang`, `DokterHewan`, `KebunBinatang` bukan turunan `Hewan`, melainkan class pendukung berelasi asosiasi (wadah/pengelola).
-
-### B. Polimorfisme (Satu Perintah, Perilaku Berbeda)
-
-```python
-for h in k.isi: print(f"{h.nama}: {h.suara()} ({h.gerak()})")
-```
-
-Perintah sama `h.suara()`, hasil beda: Singa → `Roar! (berjalan)`, Gajah → `Trumpet! (berjalan)`, Elang → `Screech! (terbang)`, Ular → `Hiss! (melata)`. Tanpa `if-else`. Inilah overriding.
-
-### C. Enkapsulasi (Perlindungan Data)
-
-```python
-self.nama = nama          # public: bebas
-self._kesehatan = 100     # protected: kalangan kebun saja
-self.__berat = berat      # private: disembunyikan
-```
-
-- `eli.__berat` dari luar → error. Jalur resmi: `get_berat()` (baca) dan `set_berat(b)` (tulis, hanya jika `b > 0`).
-- `h._kesehatan = 100` oleh dokter diperbolehkan karena dokter bagian internal sistem.
-
-### D. Konstruktor dan Instance
-
-Konstruktor (`__init__`) ada di `Hewan, Gajah, Kandang, DokterHewan, KebunBinatang`. Contoh khusus Gajah memakai `super().__init__(nama, berat)` lalu tambah `belalai`. Instance lahir di Main: `leo = Singa("Leo", 190)` — `Singa` cetakannya, `leo` wujud nyatanya.
-
----
-
-## 6. Alur Kerja Program (Dari Main Hingga Selesai)
-
-1. **Lahir:** Main membuat `leo, eli, edo, ulo`, `k1, k2`, `kebun`, `dok`.
-2. **Isi kandang:** `k1.tambah(leo)` — Mamalia; `k2` menampung elang+ular.
-3. **Himpun:** `kebun.tambah_kandang(k1)` — kandang masuk ke kebun.
-4. **Periksa:** `dok.periksa(leo)` — kesehatan kembali 100.
-5. **Demo warisan+enkapsulasi:** `eli.menyusui()` (warisan Mamalia); `get_berat()`/`set_berat()` (akses aman).
-6. **Parade:** `kebun.parade()` — telusuri tiap kandang, panggil `h.suara()` berurutan → 4 suara beda (polimorfisme).
-
----
-
-## 7. Naskah Presentasi / Script Praktikum (4 Orang, Formal)
-
-Pembagian peran:
-
-- **Orang 1 — Pembuka + Abstraksi & Inheritance:** salam, gambaran 10 class, bedah `Hewan`, `Mamalia`, `Burung`, `Singa/Gajah/Elang/Ular`.
-- **Orang 2 — Polimorfisme + Enkapsulasi + Demo Parade:** jelaskan `parade()`, jalankan program, jelaskan `nama/_kesehatan/__berat` + `get_berat/set_berat`.
-- **Orang 3 — Konstruktor, Instance & Cara Pakai + Cara Tambah Hewan Baru:** jelaskan `__init__`/`super()`, praktik `tambah()`, `periksa()`, lalu live coding `Jerapah`.
-- **Orang 4 — Alur Program + Penutup + Tanya Jawab:** rangkum alur Main, kelemahan & pengembangan, penutup dan ajakan diskusi.
-
----
-
-### Orang 1 — Pembuka + Abstraksi & Inheritance
-
-> Assalamu'alaikum, kami mempresentasikan `kebun_binatang.py`: Sistem Kebun Binatang Gembira, 10 class tanpa library tambahan, yaitu `Hewan, Mamalia, Burung, Singa, Gajah, Elang, Ular, Kandang, DokterHewan, KebunBinatang`.
->
-> Konsep pertama sesuai kode: `class Hewan` punya `__init__(self, nama, berat)` dengan `self.nama`, `self._kesehatan = 100`, `self.__berat`, plus `suara()`/`gerak()` berisi `pass`. `Mamalia(Hewan)` mengisi `gerak()` jadi `return "berjalan"` plus `menyusui()`, `Burung(Hewan)` jadi `return "terbang"`. Lalu `Singa(Mamalia)` isi `suara()` jadi `return "Roar!"`, `Gajah(Mamalia)` jadi `return "Trumpet!"`, `Elang(Burung)` jadi `return "Screech!"`, dan `Ular(Hewan)` langsung isi `return "Hiss!"` dan `return "melata"`. Lanjut ke rekan kedua untuk polimorfisme dan enkapsulasi.
-
-### Orang 2 — Polimorfisme + Enkapsulasi + Demo
-
-> Sesuai kode `KebunBinatang.parade()`: `for k in self.kandang: for h in k.isi: print(f"{h.nama}: {h.suara()} ({h.gerak()})")`. Satu perintah `h.suara()` + `h.gerak()`, tanpa `if-else`, menghasilkan empat baris persis seperti output: `Leo: Roar! (berjalan)`, `Eli: Trumpet! (berjalan)`, `Edo: Screech! (terbang)`, `Ulo: Hiss! (melata)`. [Jalankan `python3 kebun_binatang.py` dan tunjukkan blok `--- Parade Suara ---`.]
->
-> Enkapsulasi sesuai kode `Hewan`: `nama` public bebas, `_kesehatan = 100` protected hanya diubah dokter via `h._kesehatan = 100` di `periksa()` yang me-return `f"{self.nama} memeriksa {h.nama}: sehat!"`, dan `__berat` private hanya via `get_berat()`/`set_berat(b)` dengan `if b > 0`. Buktinya di Main: `Berat Eli: 1200 kg` lalu `set_berat(1250)` jadi `Berat baru: 1250 kg`. Lanjut ke rekan ketiga untuk konstruktor dan cara pakai.
-
-### Orang 3 — Konstruktor + Cara Pakai + Tambah Hewan Baru
-
-> Semua objek lahir di `if __name__ == "__main__":` persis seperti kode: `leo = Singa("Leo", 190)`, `eli = Gajah("Eli", 1200, 1.8)`, `edo = Elang("Edo", 6)`, `ulo = Ular("Ulo", 8)`. Khusus `Gajah.__init__(self, nama, berat, belalai=2)` memanggil `super().__init__(nama, berat)` lalu `self.belalai`, sehingga `print(eli.menyusui(), "| belalai:", eli.belalai, "m")` keluar `Eli menyusui anaknya | belalai: 1.8 m`. Cara pakai sesuai kode: `k1 = Kandang("Mamalia"); k1.tambah(leo); k1.tambah(eli)`, `k2 = Kandang("Lainnya"); k2.tambah(edo); k2.tambah(ulo)`, `kebun = KebunBinatang("Gembira"); kebun.tambah_kandang(k1); kebun.tambah_kandang(k2)`, `dok = DokterHewan("Dr. Ani"); print(dok.periksa(leo))` keluar `Dr. Ani memeriksa Leo: sehat!`.
->
-> Tambah hewan baru (contoh di luar kode, pola sama): `class Jerapah(Mamalia): def suara(self): return "Humm!"`, lalu `jara = Jerapah("Jara", 800); k1.tambah(jara)`, otomatis ikut `parade()` jadi `Jara: Humm! (berjalan)` tanpa ubah `parade()`, plus tetap bisa `jara.menyusui()` dan `jara.info()` format `nama | gerak | suara | beratkg`. Alur lengkap ditutup rekan keempat.
-
-### Orang 4 — Alur Program + Penutup
-
-> Alur sesuai urutan Main baris 81-96: lahirkan 4 hewan → isi `k1`/`k2` via `tambah()` → himpun via `tambah_kandang()` → `print(dok.periksa(leo))` → `print(eli.menyusui()...)` → `print("Berat Eli:", eli.get_berat()...)` + `set_berat(1250)` → `print("--- Parade Suara ---"); kebun.parade()`. Kelemahan sesuai kode: induk masih `pass` (belum `ABC`/`abstractmethod`), belum ada `hapus()` di `Kandang`, validasi hanya `b > 0`.
->
-> Demikian presentasi kelompok kami, kami siap menjawab pertanyaan. Wassalamu'alaikum warahmatullahi wabarakatuh.
-
----
-
-## 8. Tips Presentasi (Tiga Poin Utama)
-
-1. **Awali dari induk.** Tegaskan `Hewan` hanya berisi ketentuan kosong (`pass`). Tunjukkan `Singa/Gajah/Elang/Ular` mengisinya berbeda. Satu penjelasan mencakup Abstraksi + Inheritance.
-2. **Demo parade langsung.** Jalankan program, tunjukkan 4 baris output. Sampaikan perintahnya sama (`h.suara()`), hasilnya beda. Demo lebih meyakinkan daripada teori panjang.
-3. **Tekankan enkapsulasi + kelahiran objek.** `__berat` dikunci, hanya via `set_berat()` tervalidasi. Tutup dengan `leo = Singa("Leo", 190)` sebagai bukti konstruktor/instance. Bonus: live tambah `Jerapah` (5 baris) lalu `parade()` ulang tanpa edit `parade()`.
-
----
-
-## 9. Prediksi Pertanyaan Kritis Dosen Beserta Jawaban
-
-**1. Mengapa class Hewan tidak dibuat objeknya secara langsung?**
-Karena ia cetakan abstrak berisi ketentuan kosong (`pass`). Ia menetapkan setiap hewan wajib punya suara dan gerak, pelaksanaannya diserahkan ke anak agar tidak seragam.
-
-**2. Mengapa Singa bisa punya nama dan berat padahal tidak punya `__init__`?**
-Karena mewarisi konstruktor `Mamalia → Hewan`. Pewarisan memungkinkan pakai konstruktor induk tanpa tulis ulang.
-
-**3. Mengapa Gajah mendefinisikan `__init__` lagi dan memakai `super().__init__()`?**
-Karena butuh atribut tambahan `belalai`. `super().__init__()` meminjam inisialisasi induk, lalu tambah atribut khusus.
-
-**4. Apa beda `nama`, `_kesehatan`, `__berat`?**
-Tingkatan akses: public bebas, protected (satu underscore) hanya kalangan kebun, private (dua underscore) hanya via getter/setter.
-
-**5. Jika `__berat` private, mengapa `info()` bisa membacanya?**
-Karena `info()` ada di dalam class yang sama. Private melarang akses dari luar, bukan dari dalam.
-
-**6. Apakah `DokterHewan` yang mengubah `_kesehatan` melanggar enkapsulasi?**
-Tidak. Single underscore adalah konvensi protected untuk internal sistem. Dokter termasuk internal, jadi sesuai peruntukan.
-
-**7. Di mana bukti konkret polimorfisme?**
-Di `parade()`. `h.suara()` ditulis sekali, menghasilkan 4 keluaran beda karena overriding. Tanpa `if-else`.
-
-**8. Apa yang terjadi jika `Ular` tidak override `suara()`?**
-Mewarisi metode kosong induk (`pass`) → mengembalikan `None` / tidak bersuara. Ini menegaskan pentingnya overriding.
-
-**9. Apakah relasi KebunBinatang–Kandang–Hewan termasuk pewarisan?**
-Bukan. Itu asosiasi/komposisi (kepemilikan wadah). Kandang punya daftar hewan, kebun punya daftar kandang — kerja sama antarobjek, bukan pewarisan sifat.
-
-**10. Apa kelemahan rancangan ini dan pengembangannya?**
-Masih dasar: induk hanya pakai `pass` (belum memaksa anak mengisi), belum ada hapus hewan dari kandang, validasi terbatas. Pengembangan: pakai `ABC` + `@abstractmethod` untuk kontrak ketat, tambah `hapus()`, `cari()`, validasi umur/berat, dan persistensi data.
+| 11 class | 11 nama sama, 0 dekorator | AST cocok |
+| Abstract `pass` | `def aktivitas: pass` | Lupa override → `None` |
+| `Baker+super+spesialisasi` | `super().__init__`, override `ke_dict` | JSON simpan spesialisasi |
+| Composition/Aggregation | `jadwal/atur_shift`, `daftar/tambah` | Eka masuk Pagi |
+| Validasi | `set_gaji>0`, ID unik, `tanya_angka` | -5/huruf/duplikat ditolak |
+| JSON round-trip | `simpan/muat`, `buat_pegawai` | Tutup-buka cocok, poin 110 awet |
+| Polimorfisme | `operasional()` loop | Tambah peran tanpa ubah metode |
+
+Perbaikan dari `arsip/code_baru.py`: tambah `self.id_pegawai`
+(crash diperbaiki), buang dekorator/`os`/`with`, rapikan nama dan
+path, gaji float, muat umum semua shift, ID unik, poin dibatasi.
+
+## 11. Alur Program
+
+`muat(data/karyawan.json)` → bila gagal `contoh_awal+simpan` →
+`laporan+operasional` awal → `menu()` loop 1-5 → keluar `simpan()`.
+Tambah/timbang/nilai langsung bisa dicek via laporan/operasional.
+
+## 12. Pembelajaran Bertahap
+
+1. Bedakan class vs objek (`Waiter` vs `andi`).
+2. Telusuri `__init__` dan `super()` di `Baker`.
+3. Uji enkapsulasi (`get/set_gaji`, manajer).
+4. Telusuri rantai `Pegawai→Front→Waiter`.
+5. Jalankan operasional, amati satu perintah banyak hasil.
+6. Tambah peran baru dan simpan-muat JSON.
+
+## 13. Naskah Presentasi 4 Orang
+
+Pembagian: 1 pembuka+UML+abstraksi/inheritance, 2 polimorfisme+demo,
+3 enkapsulasi+konstruktor+menu/JSON, 4 bukti+alur+penutup.
+
+> Assalamu'alaikum. Kami mempresentasikan `kafe.py`: Sistem Manajemen
+> Belbel Cafe, 11 class, hanya `import json`, tanpa dekorator.
+> Masalah nyata: data kertas hilang. Solusi: input shift, gaji float
+> tervalidasi, evaluasi manajer, simpan JSON.
+> Induk `Pegawai` berisi kontrak kosong `pass`, dilengkapi anak:
+> Front ramah, Back dapur, Waiter antar, Kasir bayar, Baker panggang
+> plus spesialisasi via `super`, Barista seduh.
+> Satu perintah `p.aktivitas()` di `operasional()` menghasilkan empat
+> keluaran beda tanpa `if`. Gaji private hanya via getter/setter,
+> poin protected via manajer. Objek lahir di Main/menu, contoh
+> `andi=Waiter(...)`. Alur: muat, laporan, menu, simpan.
+> Bukti: tambah Eka, tolak duplikat, evaluasi 110, JSON awet.
+> Kelemahan: `pass` belum memaksa, belum hapus/pindah. Siap tanya jawab.
+> Wassalamu'alaikum.
+
+Orang 1 baca paragraf 1-2 + tunjuk UML. Orang 2 tunjuk operasional
+dan jalankan menu 4. Orang 3 tunjuk `set_gaji` dan demo menu 1-3-5
+plus buka JSON. Orang 4 tunjuk tabel bukti dan tutup.
+
+## 14. Tips Presentasi
+
+Awali masalah kafe nyata, demo operasional langsung, tunjukkan
+penolakan (duplikat, huruf, negatif) dan bukti JSON tetap ada.
+Jangan baca semua baris, tunjuk 3 titik: `pass`, `p.aktivitas()`,
+`set_gaji`.
+
+## 15. Prediksi Pertanyaan Dosen
+
+1. Kenapa Pegawai tidak dibuat langsung? Kontrak kosong agar tidak seragam.
+2. Kenapa Waiter tanpa init punya nama? Warisan `Front→Pegawai`.
+3. Kenapa Baker pakai `super()`? Butuh `spesialisasi`.
+4. Beda nama/id/poin/gaji? public/protected/private.
+5. Manajer ubah protected melanggar? Tidak, internal.
+6. Bukti poli? Operasional + tambah tanpa ubah metode.
+7. Lupa override? Warisi `pass` → `None`.
+8. Shift-pegawai warisan? Bukan, wadah.
+9. Bug teman apa? Lupa id, dekorator, validasi, hardcode shift.
+10. Kelemahan? `pass` belum memaksa, belum hapus; lanjut ABC + fitur gaji.

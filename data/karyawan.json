@@ -1,0 +1,44 @@
+{
+  "nama_cafe": "Belbel Cafe",
+  "shift": [
+    {
+      "nama": "Pagi",
+      "isi": [
+        {
+          "peran": "Waiter",
+          "nama": "Andi",
+          "id": "W01",
+          "gaji": 3000000.0,
+          "poin": 100
+        },
+        {
+          "peran": "Kasir",
+          "nama": "Budi",
+          "id": "K01",
+          "gaji": 3200000.0,
+          "poin": 100
+        }
+      ]
+    },
+    {
+      "nama": "Sore",
+      "isi": [
+        {
+          "peran": "Baker",
+          "nama": "Cici",
+          "id": "B01",
+          "gaji": 4000000.0,
+          "poin": 100,
+          "spesialisasi": "Pastry"
+        },
+        {
+          "peran": "Barista",
+          "nama": "Dedi",
+          "id": "R01",
+          "gaji": 3500000.0,
+          "poin": 100
+        }
+      ]
+    }
+  ]
+}
